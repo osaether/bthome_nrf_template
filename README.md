@@ -1,0 +1,1 @@
+# bthome_nrf_template
