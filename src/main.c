@@ -21,11 +21,11 @@
 static uint8_t service_data[SERVICE_DATA_LEN] = { 
 	BT_UUID_16_ENCODE(SERVICE_UUID),
 	0x40,
-	0x02,
-	0xc4,
+	0x02,	// Temperature
+	0xc4,	// 25.00 C
 	0x09,
-	0x03,
-	0xbf,
+	0x03,	// Humidity
+	0xbf,	// 50.55%
 	0x13,
 };
 
