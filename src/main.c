@@ -10,9 +10,6 @@
 #define SERVICE_DATA_LEN        9
 #define SERVICE_UUID            0xfcd2		// BTHome service UUID
 
-#define DEVICE_NAME             CONFIG_BT_DEVICE_NAME
-#define DEVICE_NAME_LEN         (sizeof(DEVICE_NAME) - 1)
-
 
 #define ADV_PARAM BT_LE_ADV_PARAM(BT_LE_ADV_OPT_USE_IDENTITY, \
 					     BT_GAP_ADV_SLOW_INT_MIN, \
@@ -31,7 +28,7 @@ static uint8_t service_data[SERVICE_DATA_LEN] = {
 
 static struct bt_data ad[] = {
 	BT_DATA_BYTES(BT_DATA_FLAGS, BT_LE_AD_GENERAL | BT_LE_AD_NO_BREDR),
-	BT_DATA(BT_DATA_NAME_COMPLETE, DEVICE_NAME, DEVICE_NAME_LEN),
+	BT_DATA(BT_DATA_NAME_COMPLETE, CONFIG_BT_DEVICE_NAME, sizeof(CONFIG_BT_DEVICE_NAME) - 1),
 	BT_DATA(BT_DATA_SVC_DATA16, service_data, ARRAY_SIZE(service_data))
 };
 
@@ -63,7 +60,6 @@ void main(void)
 	if (err) {
 		printk("Bluetooth init failed (err %d)\n", err);
 	}
-	printk("Bluetooth initialized\n");
 
 	for (;;) {
 		// Change adv data here:
