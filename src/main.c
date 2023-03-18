@@ -7,20 +7,22 @@
 #include <zephyr/bluetooth/bluetooth.h>
 #include <zephyr/bluetooth/uuid.h>
 
-#define SERVICE_DATA_LEN        9
-#define SERVICE_UUID            0xfcd2		// BTHome service UUID
+#define SERVICE_UUID            0xfcd2      // BTHome service UUID
+#define IDX_TEMPL               4           // Index of lo byte of temp in service data
+#define IDX_TEMPH               5           // Index of hi byte of temp in service data
+
 
 
 #define ADV_PARAM BT_LE_ADV_PARAM(BT_LE_ADV_OPT_USE_IDENTITY, \
 					     BT_GAP_ADV_SLOW_INT_MIN, \
 					     BT_GAP_ADV_SLOW_INT_MAX, NULL)
 
-static uint8_t service_data[SERVICE_DATA_LEN] = { 
+static uint8_t service_data[] = { 
 	BT_UUID_16_ENCODE(SERVICE_UUID),
 	0x40,
 	0x02,	// Temperature
-	0xc4,	// 25.00 C
-	0x09,
+	0x00,	// Low byte
+	0x00,   // High byte
 	0x03,	// Humidity
 	0xbf,	// 50.55%
 	0x13,
@@ -52,6 +54,7 @@ static void bt_ready(int err)
 void main(void)
 {
 	int err;
+	int temp = 0;
 
 	printk("Starting BTHome test\n");
 
@@ -59,11 +62,16 @@ void main(void)
 	err = bt_enable(bt_ready);
 	if (err) {
 		printk("Bluetooth init failed (err %d)\n", err);
+		return;
 	}
 
 	for (;;) {
-		// Change adv data here:
-		// eg. temperature
+		/* Simulate temperature from 0C to 25C */
+		service_data[IDX_TEMPH] = (temp * 100) >> 8;
+		service_data[IDX_TEMPL] = (temp * 100) & 0xff;
+		if (temp++ == 25) {
+			temp = 0;
+		}
 		err = bt_le_adv_update_data(ad, ARRAY_SIZE(ad), NULL, 0);
 		if (err) {
 			printk("Failed to update advertising data (err %d)\n", err);
